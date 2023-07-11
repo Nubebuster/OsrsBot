@@ -2,17 +2,14 @@ package net.runelite.rsb.script;
 
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.rsb.botLauncher.BotLite;
-import net.runelite.rsb.methods.MethodContext;
-import net.runelite.rsb.methods.Methods;
-import net.runelite.rsb.util.Timer;
-
-
-import net.runelite.rsb.plugin.AccountManager;
-import net.runelite.rsb.internal.BreakHandler;
 import net.runelite.rsb.event.EventMulticaster;
 import net.runelite.rsb.event.listener.PaintListener;
+import net.runelite.rsb.internal.BreakHandler;
+import net.runelite.rsb.methods.MethodContext;
+import net.runelite.rsb.methods.Methods;
+import net.runelite.rsb.plugin.AccountManager;
 import net.runelite.rsb.script.randoms.LoginBot;
-
+import net.runelite.rsb.util.Timer;
 
 import java.util.EventListener;
 import java.util.HashSet;
@@ -82,7 +79,7 @@ public abstract class Script extends Methods implements EventListener, Runnable 
 	 * of milliseconds to sleep. This ensures that pausing and anti-randoms perform normally.
 	 *
 	 * @return The number of milliseconds that the manager should sleep before
-	 *         calling it again. Returning a negative number will deactivate the script.
+	 * calling it again. Returning a negative number will deactivate the script.
 	 */
 	public abstract int loop();
 
@@ -174,7 +171,7 @@ public abstract class Script extends Methods implements EventListener, Runnable 
 	}
 
 	/**
-	 * Returns whether or not this script is paused.
+	 * Returns whether this script is paused.
 	 *
 	 * @return <code>true</code> if paused; otherwise <code>false</code>.
 	 */
@@ -183,7 +180,7 @@ public abstract class Script extends Methods implements EventListener, Runnable 
 	}
 
 	/**
-	 * Returns whether or not this script has started and not stopped.
+	 * Returns whether this script has started and not stopped.
 	 *
 	 * @return <code>true</code> if running; otherwise <code>false</code>.
 	 */
@@ -192,7 +189,7 @@ public abstract class Script extends Methods implements EventListener, Runnable 
 	}
 
 	/**
-	 * Returns whether or not the loop of this script is able to
+	 * Returns whether the loop of this script is able to
 	 * receive control (i.e. not paused, stopped or in random).
 	 *
 	 * @return <code>true</code> if active; otherwise <code>false</code>.

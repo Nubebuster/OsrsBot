@@ -2,24 +2,16 @@ package net.runelite.rsb.wrappers;
 
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Item;
-import net.runelite.api.ItemComposition;
 import net.runelite.api.TileItem;
 import net.runelite.cache.definitions.ItemDefinition;
-import net.runelite.cache.definitions.ObjectDefinition;
-import net.runelite.rsb.internal.globval.GlobalConfiguration;
 import net.runelite.rsb.methods.MethodContext;
 import net.runelite.rsb.methods.MethodProvider;
-import net.runelite.rsb.methods.Web;
 import net.runelite.rsb.wrappers.common.CacheProvider;
 import net.runelite.rsb.wrappers.common.Clickable07;
 import net.runelite.rsb.wrappers.subwrap.RSMenuNode;
 
-import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.function.Predicate;
-import java.util.regex.Pattern;
 
 /**
  * Represents an item (with an id and stack size). May or may not
@@ -115,7 +107,7 @@ public class RSItem extends MethodProvider implements Clickable07, CacheProvider
 	}
 
 	/**
-	 * Returns whether or not this item has an available definition.
+	 * Returns whether this item has an available definition.
 	 *
 	 * @return <code>true</code> if an item definition is available;
 	 *         otherwise <code>false</code>.
@@ -143,7 +135,7 @@ public class RSItem extends MethodProvider implements Clickable07, CacheProvider
 	}
 
 	/**
-	 * Checks whether or not a valid component is being wrapped.
+	 * Checks whether a valid component is being wrapped.
 	 *
 	 * @return <code>true</code> if there is a visible wrapped component.
 	 */

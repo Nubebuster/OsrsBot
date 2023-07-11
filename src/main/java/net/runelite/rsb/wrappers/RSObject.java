@@ -1,29 +1,24 @@
 package net.runelite.rsb.wrappers;
 
-import com.google.inject.Provider;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
-import net.runelite.api.Point;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.cache.definitions.ObjectDefinition;
-import net.runelite.client.callback.ClientThread;
 import net.runelite.rsb.methods.MethodContext;
 import net.runelite.rsb.methods.MethodProvider;
 import net.runelite.rsb.wrappers.common.CacheProvider;
 import net.runelite.rsb.wrappers.common.Clickable07;
 import net.runelite.rsb.wrappers.common.Positionable;
-import net.runelite.rsb.wrappers.RSTile;
-
-import java.lang.reflect.Field;
 
 /**
  * A wrapper for a tile object which interprets the underlying tile objects type and furthermore
  * acts as a factory for the RSModel of the RSObject (refer to getModel for better explanation)
- *
+ * <p>
  * RSObject can represent any {@link Type types} game object
  */
 @Slf4j
-public class RSObject extends MethodProvider implements Clickable07, Positionable, CacheProvider<ObjectDefinition>   {
+public class RSObject extends MethodProvider implements Clickable07, Positionable, CacheProvider<ObjectDefinition> {
 
 	private final TileObject obj;
 	private final Type type;
@@ -33,10 +28,11 @@ public class RSObject extends MethodProvider implements Clickable07, Positionabl
 
 	/**
 	 * Creates a new RSObject with the following parameters:
-	 * @param ctx	The context in which the object exists (the singleton RuneLite)
-	 * @param obj	The TileObject which this RSObject is associated with
-	 * @param type	The type of game object corresponding to the enumerated {@link Type types}
-	 * @param plane	The plane that this object exists on
+	 *
+	 * @param ctx   The context in which the object exists (the singleton RuneLite)
+	 * @param obj   The TileObject which this RSObject is associated with
+	 * @param type  The type of game object corresponding to the enumerated {@link Type types}
+	 * @param plane The plane that this object exists on
 	 */
 	public RSObject(final MethodContext ctx,
 					final TileObject obj, final Type type,
@@ -64,7 +60,7 @@ public class RSObject extends MethodProvider implements Clickable07, Positionabl
 	 * Gets the area of tiles covered by this object.
 	 *
 	 * @return The RSArea containing all the tiles on which this object can be
-	 *         found.
+	 * found.
 	 */
 	public RSArea getArea() {
 		if (obj instanceof GameObject) {
@@ -158,9 +154,10 @@ public class RSObject extends MethodProvider implements Clickable07, Positionabl
 		}
 		return null;
 	}
+
 	private Model toModel(Renderable r) {
 		if (r instanceof Model) {
-			return (Model)r;
+			return (Model) r;
 		} else if (r != null) {
 			return r.getModel();
 		} else {
@@ -191,12 +188,25 @@ public class RSObject extends MethodProvider implements Clickable07, Positionabl
 		return type;
 	}
 
+
+	/**
+	 * @param action the object action
+	 * @return <code>true</code> if the action is prevent, <code>false</code> if the object does not contain the
+	 * desired action
+	 */
+	public boolean hasAction(@NonNull final String action) {
+		for (final String a : getDef().getActions()) {
+			if (action.equalsIgnoreCase(a)) return true;
+		}
+		return false;
+	}
+
 	/**
 	 * Performs the specified action on this object.
 	 *
 	 * @param action the menu item to search and click
-	 * @return 		 <code>true</code> if clicked, <code>false</code> if object does not contain the
-	 *         		 desired action
+	 * @return <code>true</code> if clicked, <code>false</code> if object does not contain the
+	 * desired action
 	 */
 	public boolean doAction(final String action) {
 		return doAction(action, getName());
@@ -207,8 +217,8 @@ public class RSObject extends MethodProvider implements Clickable07, Positionabl
 	 *
 	 * @param action the action of the menu item to search and click
 	 * @param option the option of the menu item to search and click
-	 * @return 		 <code>true</code> if clicked, <code>false</code> if object does not contain the
-	 *         		 desired action
+	 * @return <code>true</code> if clicked, <code>false</code> if object does not contain the
+	 * desired action
 	 */
 	public boolean doAction(final String action, final String option) {
 		RSModel model = this.getModel();
@@ -259,6 +269,7 @@ public class RSObject extends MethodProvider implements Clickable07, Positionabl
 
 	/**
 	 * Moves the mouse over this object.
+	 *
 	 * @return true if the object was hovered over (or attempted to) otherwise false
 	 */
 	public boolean doHover() {
@@ -288,15 +299,16 @@ public class RSObject extends MethodProvider implements Clickable07, Positionabl
 		}
 		return 0;
 	}
-	
+
 	/**
 	 * Turns the camera towards the RSObject.
+	 *
 	 * @return <code>true</code> If RSObject is on screen after attempted to move camera angle.
 	 */
 	public boolean turnTo() {
 		final RSObject o = methods.objects.getNearest(getID());
-		if(o != null) {
-			if(!o.isOnScreen()) {
+		if (o != null) {
+			if (!o.isOnScreen()) {
 				methods.camera.turnTo(o);
 				return o.isOnScreen();
 			}
@@ -306,7 +318,8 @@ public class RSObject extends MethodProvider implements Clickable07, Positionabl
 
 	/**
 	 * Checks if the RSObject is clickable (interactive)
-	 * @return	<code>true</code> if the object is capable of being interacted with otherwise <code>false</code>
+	 *
+	 * @return <code>true</code> if the object is capable of being interacted with otherwise <code>false</code>
 	 */
 	public boolean isClickable() {
 		if (obj == null) {
@@ -322,6 +335,7 @@ public class RSObject extends MethodProvider implements Clickable07, Positionabl
 
 	/**
 	 * Gets the TileObject associated with this RSObject
+	 *
 	 * @return the TileObject else null
 	 */
 	public TileObject getObj() {
@@ -356,14 +370,15 @@ public class RSObject extends MethodProvider implements Clickable07, Positionabl
 
 		/**
 		 * Allows you to pass an array of enumerated types and retrieve the combined mask value
-		 * @param types		the type(s) to combine
-		 * @return			the mask value of the combined types
+		 *
+		 * @param types the type(s) to combine
+		 * @return the mask value of the combined types
 		 */
 		public static int getMask(Type... types) {
 			int sum = 0;
 			for (Type type : types) {
 				if (type != null) {
-					sum+= type.getBitValue();
+					sum += type.getBitValue();
 				}
 			}
 			return sum;

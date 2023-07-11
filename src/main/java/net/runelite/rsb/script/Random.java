@@ -1,14 +1,13 @@
 package net.runelite.rsb.script;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.util.logging.Level;
-
+import net.runelite.api.Point;
 import net.runelite.rsb.event.listener.PaintListener;
 import net.runelite.rsb.methods.MethodContext;
-import net.runelite.api.Point;
 import net.runelite.rsb.methods.Methods;
 import net.runelite.rsb.service.Monitoring;
+
+import java.awt.*;
+import java.util.logging.Level;
 
 public abstract class Random extends Methods implements PaintListener {
 
@@ -30,7 +29,7 @@ public abstract class Random extends Methods implements PaintListener {
 //	private int currentIndex = 0;
 
 	/**
-	 * Detects whether or not this anti-random should
+	 * Detects whether this anti-random should
 	 * activate.
 	 *
 	 * @return <code>true</code> if the current script

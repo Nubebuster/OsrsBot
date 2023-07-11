@@ -2,11 +2,13 @@ package net.runelite.rsb.methods;
 
 import net.runelite.api.Actor;
 import net.runelite.api.Skill;
-import net.runelite.rsb.internal.globval.VarpIndices;
 import net.runelite.rsb.internal.globval.GlobalWidgetInfo;
+import net.runelite.rsb.internal.globval.VarpIndices;
 import net.runelite.rsb.internal.globval.VarpValues;
 import net.runelite.rsb.internal.globval.enums.InterfaceTab;
-import net.runelite.rsb.wrappers.*;
+import net.runelite.rsb.wrappers.RSItem;
+import net.runelite.rsb.wrappers.RSNPC;
+import net.runelite.rsb.wrappers.RSWidget;
 
 import java.util.Arrays;
 
@@ -26,7 +28,7 @@ public class Combat extends MethodProvider {
 	 * @param foods   Optional: Array of foods we can eat,
 	 *                if no array supplied will eat edible stuff in inventory.
 	 * @return <code>true</code> once we ate to the health % (percent); otherwise
-	 *         <code>false</code>.
+	 * <code>false</code>.
 	 */
 	public boolean eatUntilHP(final int percent, final int... foods) {
 		if (foods == null || foods.length == 0) {
@@ -41,7 +43,7 @@ public class Combat extends MethodProvider {
 	 * @param percent The health percentage to eat to; eg.10%-90%
 	 * @param foods   Array of foods we can eat.
 	 * @return <code>true</code> once we ate to the health % (percent); otherwise
-	 *         <code>false</code>.
+	 * <code>false</code>.
 	 */
 	public boolean eatFoodsUntilHP(final int percent, final int... foods) {
 		int firstPercent = getHealth();
@@ -72,7 +74,7 @@ public class Combat extends MethodProvider {
 	 *
 	 * @param percent The health percentage to eat to; eg.10%-90%
 	 * @return <code>true</code> once we ate to the health % (percent); otherwise
-	 *         <code>false</code>.
+	 * <code>false</code>.
 	 */
 	public boolean eatEdibleUntilHP(final int percent) {
 		int firstPercent = getHealth();
@@ -117,7 +119,7 @@ public class Combat extends MethodProvider {
 	}
 
 	/**
-	 * Returns whether or not the auto-retaliate option is enabled.
+	 * Returns whether the auto-retaliate option is enabled.
 	 *
 	 * @return <code>true</code> if retaliate is enabled; otherwise <code>false</code>.
 	 */
@@ -142,7 +144,7 @@ public class Combat extends MethodProvider {
 	 *                  attacking modes; Else if there is only 3 attacking modes then,
 	 *                  from 0-2 corresponding to the 3 attacking modes
 	 * @return <code>true</code> if the interface was clicked; otherwise
-	 *         <code>false</code>.
+	 * <code>false</code>.
 	 * @see #getFightMode()
 	 */
 	public boolean setFightMode(int fightMode) {
@@ -225,7 +227,7 @@ public class Combat extends MethodProvider {
 	/**
 	 * Returns whether we're envenomed
 	 *
-	 * @return	<code>true</code> if the local player is envenomed; otherwise <code>false</code>
+	 * @return    <code>true</code> if the local player is envenomed; otherwise <code>false</code>
 	 */
 	public boolean isEnvenomed() {
 		return methods.clientLocalStorage.getVarpValueAt(VarpIndices.POISON) >= 1000000;
@@ -325,7 +327,7 @@ public class Combat extends MethodProvider {
 	 *
 	 * @param npc The RSNPC to check.
 	 * @return <code>true</code> if the Npc is dead or dying; otherwise
-	 *         <code>false</code>.
+	 * <code>false</code>.
 	 */
 	//TODO: this will need investigation as there will always be special cases
 	public boolean isDead(final RSNPC npc) {
@@ -363,7 +365,7 @@ public class Combat extends MethodProvider {
 	}
 
 	public double getFinishableHP(double maxHP, double finishHP) {
-		return Math.floor(finishHP/(maxHP/100));
+		return Math.floor(finishHP / (maxHP / 100));
 	}
 
 	public boolean canBeFinished(final RSNPC npc) {
