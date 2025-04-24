@@ -73,14 +73,12 @@ public abstract class BaseClientWrapper extends Applet implements Client {
         return wrappedClient.getNpcs();
     }
 
-    @Override
     public NPC[] getCachedNPCs() {
-        return wrappedClient.getCachedNPCs();
+       return (NPC[]) wrappedClient.getTopLevelWorldView().npcs().stream().toArray();
     }
 
-    @Override
     public Player[] getCachedPlayers() {
-        return wrappedClient.getCachedPlayers();
+        return (Player[]) wrappedClient.getTopLevelWorldView().players().stream().toArray();
     }
 
     @Override
@@ -225,6 +223,11 @@ public abstract class BaseClientWrapper extends Applet implements Client {
     @Override
     public int getWorld() {
         return wrappedClient.getWorld();
+    }
+
+    @Override
+    public String getWorldHost() {
+        return wrappedClient.getWorldHost();
     }
 
     @Override
@@ -774,6 +777,26 @@ public abstract class BaseClientWrapper extends Applet implements Client {
     @Nullable
     public LocalPoint getLocalDestinationLocation() {
         return wrappedClient.getLocalDestinationLocation();
+    }
+
+    @Override
+    public void registerRuneLiteObject(RuneLiteObjectController controller) {
+        wrappedClient.registerRuneLiteObject(controller);
+    }
+
+    @Override
+    public void removeRuneLiteObject(RuneLiteObjectController controller) {
+        wrappedClient.removeRuneLiteObject(controller);
+    }
+
+    @Override
+    public boolean isRuneLiteObjectRegistered(RuneLiteObjectController controller) {
+        return wrappedClient.isRuneLiteObjectRegistered(controller);
+    }
+
+    @Override
+    public List<MidiRequest> getActiveMidiRequests() {
+        return wrappedClient.getActiveMidiRequests();
     }
 
     @Override

@@ -173,6 +173,11 @@ public class RSClient extends BaseClientWrapper {
     }
 
     @Override
+    public String getWorldHost() {
+        return super.getWorldHost();
+    }
+
+    @Override
     public int getCameraMode() {
         return super.getCameraMode();
     }
@@ -298,6 +303,26 @@ public class RSClient extends BaseClientWrapper {
     }
 
     @Override
+    public void registerRuneLiteObject(RuneLiteObjectController controller) {
+        super.registerRuneLiteObject(controller);
+    }
+
+    @Override
+    public void removeRuneLiteObject(RuneLiteObjectController controller) {
+        super.removeRuneLiteObject(controller);
+    }
+
+    @Override
+    public boolean isRuneLiteObjectRegistered(RuneLiteObjectController controller) {
+        return super.isRuneLiteObjectRegistered(controller);
+    }
+
+    @Override
+    public List<MidiRequest> getActiveMidiRequests() {
+        return super.getActiveMidiRequests();
+    }
+
+    @Override
     public int getArraySizes(int i) {
         return super.getArraySizes(i);
     }
@@ -322,6 +347,11 @@ public class RSClient extends BaseClientWrapper {
     @Override
     public CollisionData[] getCollisionMaps() { // tested, causes freezes without runOnClientThread
         return runOnClientThread(super::getCollisionMaps);
+    }
+
+    @Override
+    public Model applyTransformations(Model model, @Nullable Animation animA, int frameA, @Nullable Animation animB, int frameB) {
+        return null;
     }
 
     private class WidgetWrapper extends BaseWidgetWrapper {
