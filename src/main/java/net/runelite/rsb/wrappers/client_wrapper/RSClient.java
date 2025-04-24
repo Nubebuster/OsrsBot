@@ -7,6 +7,7 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.api.worldmap.MapElementConfig;
 import net.runelite.client.callback.ClientThread;
+import net.runelite.api.RuneLiteObjectController;
 
 import javax.annotation.Nullable;
 import java.time.Instant;
@@ -23,336 +24,6 @@ Running methods on client thread comes with a performance hit, so only methods t
 */
 public class RSClient extends BaseClientWrapper {
     private final Queue<FutureTask<Object>> taskQueue = new ConcurrentLinkedQueue<>();
-
-    public RSClient(Client client, ClientThread clientThread) {
-        super(client);
-        clientThread.invoke(() -> {
-            final var expirationTime = Instant.now().plusMillis(20);
-            if (taskQueue.isEmpty()) return false;
-            while (Instant.now().isBefore(expirationTime)) {
-                final var task = taskQueue.poll();
-                if (task != null) {
-                    task.run();
-                }
-            }
-            return false;
-        });
-    }
-
-    private void runTask(FutureTask<Object> task) {
-        if (super.isClientThread()) {
-            task.run();
-        } else {
-            taskQueue.add(task);
-        }
-    }
-
-    @SneakyThrows
-    private void runOnClientThread(Runnable method) {
-        final var task = new FutureTask<Object>(() -> { method.run();return null; } );
-        runTask(task);
-        task.get();
-    }
-
-    private <T> T convertResult(T result) {
-        if (result instanceof Widget concreteResult) {
-            return (T) new WidgetWrapper(concreteResult);
-        } else if (result instanceof Widget[] concreteResult) {
-            WidgetWrapper[] convertedResult = new WidgetWrapper[concreteResult.length];
-            for (int i = 0 ; i < concreteResult.length ; i++) {
-                convertedResult[i] = new WidgetWrapper(concreteResult[i]);
-            }
-            return (T) convertedResult;
-        }
-        return result;
-    }
-
-    private Widget[] convertArg(Widget[] arg) {
-        Widget[] convertedArg = new Widget[arg.length];
-        for (int i = 0 ; i < arg.length ; i++) {
-            if (arg[i] instanceof WidgetWrapper widgetWrapper) {
-                convertedArg[i] = widgetWrapper.wrappedWidget;
-            } else {
-                convertedArg[i] = arg[i];
-            }
-        }
-        return convertedArg;
-    }
-
-    @SneakyThrows
-    private <T> T runOnClientThread(Callable<T> method) {
-        final var task = new FutureTask<Object>(() -> convertResult(method.call()));
-        runTask(task);
-        return (T) task.get();
-    }
-
-    @Override
-    @Nullable
-    public Widget getDraggedWidget() { // tested, no need to runOnClientThread
-        return convertResult(super.getDraggedWidget());
-    }
-
-    @Override
-    @Nullable
-    public Widget getDraggedOnWidget() { // tested, no need to runOnClientThread
-        return convertResult(super.getDraggedOnWidget());
-    }
-
-    @Override
-    public void setDraggedOnWidget(Widget widget) {
-        super.setDraggedOnWidget(((WidgetWrapper) widget).wrappedWidget);
-    }
-
-    @Override
-    public Widget[] getWidgetRoots() { // tested, no need to runOnClientThread
-        return convertResult(super.getWidgetRoots());
-    }
-
-    @SneakyThrows
-    @Override
-    @Nullable
-    public Widget getWidget(WidgetInfo widget) { // tested, no need to runOnClientThread
-        return convertResult(super.getWidget(widget));
-    }
-
-    @Override
-    @Nullable
-    public Widget getWidget(int groupId, int childId) { // tested, no need to runOnClientThread
-        return convertResult(super.getWidget(groupId, childId));
-    }
-
-    @Override
-    @Nullable
-    public Widget getWidget(int packedID) { // tested, no need to runOnClientThread
-        return convertResult(super.getWidget(packedID));
-    }
-    @Override
-    public MapElementConfig getMapElementConfig(int id) {
-        return convertResult(super.getMapElementConfig(id));
-    }
-
-    @Override
-    public Widget getScriptActiveWidget() {
-        return convertResult(super.getScriptActiveWidget());
-    }
-
-    @Override
-    public Widget getScriptDotWidget() {
-        return convertResult(super.getScriptDotWidget());
-    }
-
-    @Override
-    public void setCameraSpeed(float v) {
-        super.setCameraSpeed(v);
-    }
-
-    @Override
-    public void setCameraMouseButtonMask(int i) {
-        super.setCameraMouseButtonMask(i);
-    }
-
-    @Override
-    @Deprecated
-    public RenderOverview getRenderOverview() {
-        return super.getRenderOverview();
-    }
-
-    @Override
-    public void setHintArrow(LocalPoint point) {
-        super.setHintArrow(point);
-    }
-
-    @Override
-    public IntPredicate getAnimationInterpolationFilter() {
-        return super.getAnimationInterpolationFilter();
-    }
-
-    @Override
-    public void setAnimationInterpolationFilter(IntPredicate intPredicate) {
-        super.setAnimationInterpolationFilter(intPredicate);
-    }
-
-    @Override
-    public String getWorldHost() {
-        return super.getWorldHost();
-    }
-
-    @Override
-    public int getCameraMode() {
-        return super.getCameraMode();
-    }
-
-    @Override
-    public void setCameraMode(int i) {
-        super.setCameraMode(i);
-    }
-
-    @Override
-    public double getCameraFocalPointX() {
-        return super.getCameraFocalPointX();
-    }
-
-    @Override
-    public void setCameraFocalPointX(double v) {
-        super.setCameraFocalPointX(v);
-    }
-
-    @Override
-    public void setCameraFocalPointY(double v) {
-        super.setCameraFocalPointY(v);
-    }
-
-    @Override
-    public double getCameraFocalPointZ() {
-        return super.getCameraFocalPointZ();
-    }
-
-    @Override
-    public void setFreeCameraSpeed(int i) {
-        super.setFreeCameraSpeed(i);
-    }
-
-    @Override
-    public void checkClickbox(Projection projection, Model model, int i, int i1, int i2, int i3, long l) {
-        super.checkClickbox(projection, model, i, i1, i2, i3, l);
-    }
-
-    @Override
-    public double getCameraFocalPointY() {
-        return super.getCameraFocalPointY();
-    }
-
-    @Override
-    public boolean isWidgetSelected() {return super.isWidgetSelected();}
-
-    @Override
-    @Nullable
-    public Widget getSelectedWidget() {
-        return convertResult(super.getSelectedWidget());
-    }
-
-    @Override
-    public void setWidgetSelected(boolean selected) {
-        super.setWidgetSelected(selected);
-    }
-
-    @Override
-    public void setIdleTimeout(int ticks) {
-        super.setIdleTimeout(ticks);
-    }
-
-    @Override
-    public int getIdleTimeout() {
-        return convertResult(super.getIdleTimeout());
-    }
-
-    @Override
-    public void setMinimapTileDrawer(TileFunction drawTile) {
-        super.setMinimapTileDrawer(drawTile);
-    }
-
-    @Override
-    public void setCameraShakeDisabled(boolean b) {
-        super.setCameraShakeDisabled(b);
-    }
-
-    @Override
-    public boolean isCameraShakeDisabled() {
-        return super.isCameraShakeDisabled();
-    }
-
-    @Override
-    public Menu getMenu() {
-        return super.getMenu();
-    }
-
-    @Override
-    public Rasterizer getRasterizer() {
-        return super.getRasterizer();
-    }
-
-    @Override
-    public void menuAction(int i, int i1, MenuAction menuAction, int i2, int i3, String s, String s1) {
-        super.menuAction(i, i1, menuAction, i2, i3, s, s1);
-    }
-
-    @Override
-    public WorldView getWorldView(int i) {
-        return convertResult(super.getWorldView(i));
-    }
-
-    @Override
-    public WorldView getTopLevelWorldView() {
-        return convertResult(super.getTopLevelWorldView());
-    }
-
-    @Override
-    public int getDraw2DMask() {
-        return super.getDraw2DMask();
-    }
-
-    @Override
-    public void setDraw2DMask(int i) {
-        super.setDraw2DMask(i);
-    }
-
-    @Nullable
-    @Override
-    public LocalPoint getLocalDestinationLocation() { // tested, causes freezes without runOnClientThread
-        return runOnClientThread(super::getLocalDestinationLocation);
-    }
-
-    @Override
-    public void registerRuneLiteObject(RuneLiteObjectController controller) {
-        super.registerRuneLiteObject(controller);
-    }
-
-    @Override
-    public void removeRuneLiteObject(RuneLiteObjectController controller) {
-        super.removeRuneLiteObject(controller);
-    }
-
-    @Override
-    public boolean isRuneLiteObjectRegistered(RuneLiteObjectController controller) {
-        return super.isRuneLiteObjectRegistered(controller);
-    }
-
-    @Override
-    public List<MidiRequest> getActiveMidiRequests() {
-        return super.getActiveMidiRequests();
-    }
-
-    @Override
-    public int getArraySizes(int i) {
-        return super.getArraySizes(i);
-    }
-
-    @Override
-    public int[] getArray(int i) {
-        return super.getArray(i);
-    }
-
-    @Nullable
-    @Override
-    public String getLauncherDisplayName() {
-        return super.getLauncherDisplayName();
-    }
-
-    @Override
-    public Player getLocalPlayer() { // tested, causes freezes without runOnClientThread
-        return runOnClientThread(super::getLocalPlayer);
-    }
-
-    @Nullable
-    @Override
-    public CollisionData[] getCollisionMaps() { // tested, causes freezes without runOnClientThread
-        return runOnClientThread(super::getCollisionMaps);
-    }
-
-    @Override
-    public Model applyTransformations(Model model, @Nullable Animation animA, int frameA, @Nullable Animation animB, int frameB) {
-        return null;
-    }
 
     private class WidgetWrapper extends BaseWidgetWrapper {
 
@@ -645,5 +316,362 @@ public class RSClient extends BaseClientWrapper {
         public int[] getVarTransmitTrigger() {
             return super.getVarTransmitTrigger();
         }
+    }
+
+
+    public RSClient(Client client, ClientThread clientThread) {
+        super(client);
+        clientThread.invoke(() -> {
+            final var expirationTime = Instant.now().plusMillis(20);
+            if (taskQueue.isEmpty()) return false;
+            while (Instant.now().isBefore(expirationTime)) {
+                final var task = taskQueue.poll();
+                if (task != null) {
+                    task.run();
+                }
+            }
+            return false;
+        });
+    }
+
+    private void runTask(FutureTask<Object> task) {
+        if (super.isClientThread()) {
+            task.run();
+        } else {
+            taskQueue.add(task);
+        }
+    }
+
+    @SneakyThrows
+    private void runOnClientThread(Runnable method) {
+        final var task = new FutureTask<Object>(() -> {
+            method.run();
+            return null;
+        });
+        runTask(task);
+        task.get();
+    }
+
+    private <T> T convertResult(T result) {
+        if (result instanceof Widget concreteResult) {
+            return (T) new WidgetWrapper(concreteResult);
+        } else if (result instanceof Widget[] concreteResult) {
+            WidgetWrapper[] convertedResult = new WidgetWrapper[concreteResult.length];
+            for (int i = 0; i < concreteResult.length; i++) {
+                convertedResult[i] = new WidgetWrapper(concreteResult[i]);
+            }
+            return (T) convertedResult;
+        }
+        return result;
+    }
+
+    private Widget[] convertArg(Widget[] arg) {
+        Widget[] convertedArg = new Widget[arg.length];
+        for (int i = 0; i < arg.length; i++) {
+            if (arg[i] instanceof WidgetWrapper widgetWrapper) {
+                convertedArg[i] = widgetWrapper.wrappedWidget;
+            } else {
+                convertedArg[i] = arg[i];
+            }
+        }
+        return convertedArg;
+    }
+
+    @SneakyThrows
+    private <T> T runOnClientThread(Callable<T> method) {
+        final var task = new FutureTask<Object>(() -> convertResult(method.call()));
+        runTask(task);
+        return (T) task.get();
+    }
+
+    @Override
+    @Nullable
+    public Widget getDraggedWidget() { // tested, no need to runOnClientThread
+        return convertResult(super.getDraggedWidget());
+    }
+
+    @Override
+    @Nullable
+    public Widget getDraggedOnWidget() { // tested, no need to runOnClientThread
+        return convertResult(super.getDraggedOnWidget());
+    }
+
+    @Override
+    public void setDraggedOnWidget(Widget widget) {
+        super.setDraggedOnWidget(((WidgetWrapper) widget).wrappedWidget);
+    }
+
+    @Override
+    public Widget[] getWidgetRoots() { // tested, no need to runOnClientThread
+        return convertResult(super.getWidgetRoots());
+    }
+
+    @SneakyThrows
+    @Override
+    @Nullable
+    public Widget getWidget(WidgetInfo widget) { // tested, no need to runOnClientThread
+        return convertResult(super.getWidget(widget));
+    }
+
+    @Override
+    @Nullable
+    public Widget getWidget(int groupId, int childId) { // tested, no need to runOnClientThread
+        return convertResult(super.getWidget(groupId, childId));
+    }
+
+    @Override
+    @Nullable
+    public Widget getWidget(int packedID) { // tested, no need to runOnClientThread
+        return convertResult(super.getWidget(packedID));
+    }
+
+    @Override
+    public MapElementConfig getMapElementConfig(int id) {
+        return convertResult(super.getMapElementConfig(id));
+    }
+
+    @Override
+    public Widget getScriptActiveWidget() {
+        return convertResult(super.getScriptActiveWidget());
+    }
+
+    @Override
+    public Widget getScriptDotWidget() {
+        return convertResult(super.getScriptDotWidget());
+    }
+
+    @Override
+    public void setCameraSpeed(float v) {
+        super.setCameraSpeed(v);
+    }
+
+    @Override
+    public void setCameraMouseButtonMask(int i) {
+        super.setCameraMouseButtonMask(i);
+    }
+
+    @Override
+    @Deprecated
+    public RenderOverview getRenderOverview() {
+        return super.getRenderOverview();
+    }
+
+    @Override
+    public void setHintArrow(LocalPoint point) {
+        super.setHintArrow(point);
+    }
+
+    @Override
+    public IntPredicate getAnimationInterpolationFilter() {
+        return super.getAnimationInterpolationFilter();
+    }
+
+    @Override
+    public void setAnimationInterpolationFilter(IntPredicate intPredicate) {
+        super.setAnimationInterpolationFilter(intPredicate);
+    }
+
+    @Override
+    public String getWorldHost() {
+        return super.getWorldHost();
+    }
+
+    @Override
+    public int getCameraMode() {
+        return super.getCameraMode();
+    }
+
+    @Override
+    public void setCameraMode(int i) {
+        super.setCameraMode(i);
+    }
+
+    @Override
+    public double getCameraFocalPointX() {
+        return super.getCameraFocalPointX();
+    }
+
+    @Override
+    public void setCameraFocalPointX(double v) {
+        super.setCameraFocalPointX(v);
+    }
+
+    @Override
+    public void setCameraFocalPointY(double v) {
+        super.setCameraFocalPointY(v);
+    }
+
+    @Override
+    public double getCameraFocalPointZ() {
+        return super.getCameraFocalPointZ();
+    }
+
+    @Override
+    public void setFreeCameraSpeed(int i) {
+        super.setFreeCameraSpeed(i);
+    }
+
+    @Override
+    public void checkClickbox(Projection projection, Model model, int i, int i1, int i2, int i3, long l) {
+        super.checkClickbox(projection, model, i, i1, i2, i3, l);
+    }
+
+    @Override
+    public double getCameraFocalPointY() {
+        return super.getCameraFocalPointY();
+    }
+
+    @Override
+    public boolean isWidgetSelected() {
+        return super.isWidgetSelected();
+    }
+
+    @Override
+    @Nullable
+    public Widget getSelectedWidget() {
+        return convertResult(super.getSelectedWidget());
+    }
+
+    @Override
+    public void setWidgetSelected(boolean selected) {
+        super.setWidgetSelected(selected);
+    }
+
+    @Override
+    public void setIdleTimeout(int ticks) {
+        super.setIdleTimeout(ticks);
+    }
+
+    @Override
+    public int getIdleTimeout() {
+        return convertResult(super.getIdleTimeout());
+    }
+
+    @Override
+    public void setMinimapTileDrawer(TileFunction drawTile) {
+        super.setMinimapTileDrawer(drawTile);
+    }
+
+    @Override
+    public void setCameraShakeDisabled(boolean b) {
+        super.setCameraShakeDisabled(b);
+    }
+
+    @Override
+    public boolean isCameraShakeDisabled() {
+        return super.isCameraShakeDisabled();
+    }
+
+    @Override
+    public Menu getMenu() {
+        return super.getMenu();
+    }
+
+    @Override
+    public Rasterizer getRasterizer() {
+        return super.getRasterizer();
+    }
+
+    @Override
+    public void menuAction(int i, int i1, MenuAction menuAction, int i2, int i3, String s, String s1) {
+        super.menuAction(i, i1, menuAction, i2, i3, s, s1);
+    }
+
+    @Override
+    public WorldView getWorldView(int i) {
+        return convertResult(super.getWorldView(i));
+    }
+
+    @Override
+    public WorldView getTopLevelWorldView() {
+        return convertResult(super.getTopLevelWorldView());
+    }
+
+    @Nullable
+    @Override
+    public LocalPoint getLocalDestinationLocation() { // tested, causes freezes without runOnClientThread
+        return runOnClientThread(super::getLocalDestinationLocation);
+    }
+
+    @Override
+    public void registerRuneLiteObject(RuneLiteObjectController controller) {
+        super.registerRuneLiteObject(controller);
+    }
+
+    @Override
+    public void removeRuneLiteObject(RuneLiteObjectController controller) {
+        super.removeRuneLiteObject(controller);
+    }
+
+    @Override
+    public boolean isRuneLiteObjectRegistered(RuneLiteObjectController controller) {
+        return super.isRuneLiteObjectRegistered(controller);
+    }
+
+    @Override
+    public List<MidiRequest> getActiveMidiRequests() {
+        return super.getActiveMidiRequests();
+    }
+
+    @Override
+    public int getArraySizes(int i) {
+        return super.getArraySizes(i);
+    }
+
+    @Override
+    public int[] getArray(int i) {
+        return super.getArray(i);
+    }
+
+    @Nullable
+    @Override
+    public String getLauncherDisplayName() {
+        return super.getLauncherDisplayName();
+    }
+
+    @Override
+    public Player getLocalPlayer() { // tested, causes freezes without runOnClientThread
+        return runOnClientThread(super::getLocalPlayer);
+    }
+
+    @Nullable
+    @Override
+    public CollisionData[] getCollisionMaps() { // tested, causes freezes without runOnClientThread
+        return runOnClientThread(super::getCollisionMaps);
+    }
+
+    @Override
+    public Model applyTransformations(Model m, Animation animA, int frameA, Animation animB, int frameB) {
+        return super.applyTransformations(m, animA, frameA, animB, frameB);
+    }
+
+    @Override
+    public void setDraw2DMask(int mask) {
+        super.setDraw2DMask(mask);
+    }
+
+    @Override
+    public int getDraw2DMask() {
+        return super.getDraw2DMask();
+    }
+
+    public void setClient(int client) {
+        setClient(client);
+    }
+
+    public long qu() {
+        return qu();
+    }
+
+    public boolean isOnLoginScreen() {
+        return isOnLoginScreen();
+    }
+
+    public boolean pf() {
+        return pf();
+    }
+
+    public void pg(int a) {
+        pg(a);
     }
 }
