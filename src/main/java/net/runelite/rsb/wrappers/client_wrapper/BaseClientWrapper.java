@@ -1,8 +1,7 @@
 package net.runelite.rsb.wrappers.client_wrapper;
 
+import com.jagex.oldscape.pub.OAuthApi;
 import net.runelite.api.*;
-import net.runelite.api.Menu;
-import net.runelite.api.Point;
 import net.runelite.api.annotations.Varp;
 import net.runelite.api.clan.ClanChannel;
 import net.runelite.api.clan.ClanSettings;
@@ -14,7 +13,6 @@ import net.runelite.api.hooks.DrawCallbacks;
 import net.runelite.api.vars.AccountType;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
-import net.runelite.api.widgets.WidgetModalMode;
 import net.runelite.api.worldmap.MapElementConfig;
 import net.runelite.api.worldmap.WorldMap;
 
@@ -31,7 +29,8 @@ import java.util.function.IntPredicate;
 Base class for wrapping runelite Client, along with some weird Applet shenanigans.
 */
 @SuppressWarnings("removal")
-public abstract class BaseClientWrapper extends Applet implements Client {
+public abstract class BaseClientWrapper extends Applet implements Client, OAuthApi
+{
     public final Client wrappedClient;
 
     public BaseClientWrapper(Client client) {
@@ -266,7 +265,7 @@ public abstract class BaseClientWrapper extends Applet implements Client {
     }
 
     @Override
-    public Point getMouseCanvasPosition() {
+    public net.runelite.api.Point getMouseCanvasPosition() {
         return wrappedClient.getMouseCanvasPosition();
     }
 
@@ -1610,7 +1609,7 @@ public abstract class BaseClientWrapper extends Applet implements Client {
     }
 
     @Override
-    public Menu getMenu() {
+    public net.runelite.api.Menu getMenu() {
         return wrappedClient.getMenu();
     }
 
@@ -1645,12 +1644,17 @@ public abstract class BaseClientWrapper extends Applet implements Client {
     }
 
     @Override
-    public int getDraw2DMask() {
-        return wrappedClient.getDraw2DMask();
+    public Model applyTransformations(Model m, Animation animA, int frameA, Animation animB, int frameB) {
+        return wrappedClient.applyTransformations(m, animA, frameA, animB, frameB);
     }
 
     @Override
-    public void setDraw2DMask(int i) {
-        wrappedClient.setDraw2DMask(i);
+    public void setDraw2DMask(int mask) {
+        wrappedClient.setDraw2DMask(mask);
+    }
+
+    @Override
+    public int getDraw2DMask() {
+        return wrappedClient.getDraw2DMask();
     }
 }
